@@ -4,9 +4,10 @@ from fractions import Fraction
 from litex.gen import *
 from litex.gen.genlib.resetsync import AsyncResetSynchronizer
 
+from litex.soc.cores import uart
 from litex.soc.cores.flash import spi_flash
-from litex.soc.integration.soc_sdram import *
 from litex.soc.integration.builder import *
+from litex.soc.integration.soc_sdram import *
 
 from litedram.modules import MT46H32M16
 from litedram.phy import s6ddrphy
@@ -14,6 +15,7 @@ from litedram.core import ControllerSettings
 
 from gateware import info
 #from gateware import i2c_hack
+from gateware.debug.uart import jtag
 
 from targets.utils import csr_map_update
 
@@ -204,9 +206,13 @@ class BaseSoC(SoCSDRAM):
 #        self.submodules.fx2_reset = gpio.GPIOOut(platform.request("fx2_reset"))
 #        self.submodules.fx2_hack = i2c_hack.I2CShiftReg(platform.request("opsis_eeprom"))
 
-        self.submodules.suart = shared_uart.SharedUART(self.clk_freq, 115200)
-        self.suart.add_uart_pads(platform.request('fx2_serial'))
-        self.submodules.uart = self.suart.uart
+#        self.submodules.suart = shared_uart.SharedUART(self.clk_freq, 115200)
+#        self.suart.add_uart_pads(platform.request('fx2_serial'))
+#        self.submodules.uart = self.suart.uart
+
+        self.submodules.uart_phy = jtag.Phy(jtag.BscanSpartan6())
+        self.submodules.uart = uart.UART(self.uart_phy, phy_cd="jtag")
+        platform.add_period_constraint(self.uart_phy.impl.clk, 12.0)
 
         self.submodules.spiflash = spi_flash.SpiFlash(
             platform.request("spiflash4x"),
