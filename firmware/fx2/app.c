@@ -53,6 +53,7 @@ void fifoSetEnabled(uint8 mode) {
 
 // Called once at startup
 //
+extern void uart_init();
 void mainInit(void) {
 
 	__xdata uint8 thisByte = 0xFF;
@@ -99,20 +100,20 @@ void mainInit(void) {
 	SYNCDELAY; EP1INCFG = (bmVALID | bmBULK); // 0xa0
 
 	// EP2OUT & EP6IN are quad-buffered bulk endpoints
-	SYNCDELAY; EP2CFG = (bmVALID | bmBULK); // 0xa0
-	SYNCDELAY; EP4CFG = 0x00;
+	//SYNCDELAY; EP2CFG = (bmVALID | bmBULK); // 0xa0
+	//SYNCDELAY; EP4CFG = 0x00;
 	SYNCDELAY; EP6CFG = (bmVALID | bmBULK | bmDIR); // 0xe0
 	SYNCDELAY; EP8CFG = 0x00;
 
 	// EP2OUT & EP6IN automatically commit packets
-	SYNCDELAY; EP2FIFOCFG = bmAUTOOUT; // 0x10
-	SYNCDELAY; EP4FIFOCFG = 0x00;
+	//SYNCDELAY; EP2FIFOCFG = bmAUTOOUT; // 0x10
+	//SYNCDELAY; EP4FIFOCFG = 0x00;
 	SYNCDELAY; EP6FIFOCFG = bmAUTOIN; // 0x08
 	SYNCDELAY; EP8FIFOCFG = 0x00;
 
 	// Reset FIFOs for EP2OUT & EP6IN
 	SYNCDELAY; FIFORESET = bmNAKALL; // 0x80
-	SYNCDELAY; FIFORESET = 2;  // reset EP2OUT
+	//SYNCDELAY; FIFORESET = 2;  // reset EP2OUT
 	SYNCDELAY; FIFORESET = 6;  // reset EP6IN
 	SYNCDELAY; FIFORESET = 0x00;
 
@@ -120,11 +121,10 @@ void mainInit(void) {
 	EP1OUTBC = 0x00;
 
 	// Arm the EP2OUT buffers. Done four times because it's quad-buffered
-	SYNCDELAY; OUTPKTEND = bmSKIP | 2;  // EP2OUT 0x82
-	SYNCDELAY; OUTPKTEND = bmSKIP | 2;
-	SYNCDELAY; OUTPKTEND = bmSKIP | 2;
-	SYNCDELAY; OUTPKTEND = bmSKIP | 2;
-
+	//SYNCDELAY; OUTPKTEND = bmSKIP | 2;  // EP2OUT 0x82
+	//SYNCDELAY; OUTPKTEND = bmSKIP | 2;
+	//SYNCDELAY; OUTPKTEND = bmSKIP | 2;
+	//SYNCDELAY; OUTPKTEND = bmSKIP | 2;
 
 	// Auto-commit 512-byte packets from EP6IN (master may commit early by asserting PKTEND)
 	SYNCDELAY; EP6AUTOINLENH = 0x02;
@@ -155,8 +155,11 @@ void mainInit(void) {
 #endif
 	*/
 	I2CTL |= bm400KHZ;
+
 	TD_Init();
 	
+	uart_init();
+
 #ifdef DEBUG
 	usartInit();
 	{
@@ -214,6 +217,8 @@ if (!(EP1INCS & 0x02))      // check if EP1IN is available
 	TD_Poll();
 	// If there is a shift operation pending, execute it now.
 	//progShiftExecute();
+
+	cdc_receive_poll();
 }
 
 #define FIFO_MODE 0x0000
@@ -265,7 +270,7 @@ uint8 portAccess(uint8 portNumber, uint8 bitMask, uint8 drive, uint8 high) {
 uint8 handleVendorCommand(uint8 cmd) {
 	if (handleUVCCommand(cmd))
             return true;
-	if (handleCDCCommand(cmd))
+	if (cdc_handle_command(cmd))
             return true;
 
 /*
@@ -461,7 +466,9 @@ void TD_Init(void)             // Called once at startup
      *                      Required to be 0b11 for Slave FIFO. See Page 15-16 TRM
      */
      
-    SYNCDELAY; IFCONFIG = 0xE3; // Internal Clock, 48MHz, IFCLK output enable to pin, Normal Polarity, Synchronous FIFO, Nothing to do with GSTATE, Set interface mode to Slave FIFO.
+    // Internal Clock, 48MHz, IFCLK output enable to pin, Normal Polarity, 
+	// Synchronous FIFO, Nothing to do with GSTATE, Set interface mode to Slave FIFO.
+    SYNCDELAY; IFCONFIG = 0xE3; 
     
 	// EP1OUT & EP1IN
     /* 
@@ -518,32 +525,19 @@ void TD_Init(void)             // Called once at startup
      *                      |______|______|___________|
      */
     
-    // Used by the CDC serial port (EP2 == TX, EP4 == RX)
-	SYNCDELAY; EP2CFG = 0xA2;  // Activate, OUT Direction, BULK Type, 512  bytes Size, Double buffered
-	SYNCDELAY; EP4CFG = 0xE2;  // Activate, IN  Direction, BULK Type, 512  bytes Size, Double buffered
     // Used by the video data
 	SYNCDELAY; EP6CFG = 0xDA;  // Activate, IN  Direction, ISO  Type, 1024 bytes Size, Double buffered
 	SYNCDELAY; EP8CFG = 0x00;  // Disable Endpoint 8
 	
 	// 0 INFM1 OEP1 AUTOOUT AUTOIN ZEROLENIN 0 WORDWIDE
-	SYNCDELAY; EP2FIFOCFG = 0x10;  // Auto
-	SYNCDELAY; EP4FIFOCFG = 0x0C;
 	SYNCDELAY; EP6FIFOCFG = 0x0C;
-	SYNCDELAY; EP8FIFOCFG = 0x00;
-	
-	SYNCDELAY; EP4AUTOINLENH = 0x02;
-	SYNCDELAY; EP4AUTOINLENL = 0x00;
 	SYNCDELAY; EP6AUTOINLENH = 0x04;
 	SYNCDELAY; EP6AUTOINLENL = 0x00;
+
+	SYNCDELAY; EP8FIFOCFG = 0x00;
 	
-	SYNCDELAY; REVCTL = 0x03; // REVCTL.0 and REVCTL.1 set to 1
-	SYNCDELAY; FIFORESET = 0x80; // Reset the FIFO
-	SYNCDELAY; FIFORESET = 0x82;
-	SYNCDELAY; FIFORESET = 0x84;
-	SYNCDELAY; FIFORESET = 0x86;
-	SYNCDELAY; FIFORESET = 0x00;
-
-
+	SYNCDELAY; REVCTL = 0x00; // REVCTL.0 and REVCTL.1 set to 1
+	RESETFIFOS();
 }
 
 void TD_Poll(void)             // Called repeatedly while the device is idle

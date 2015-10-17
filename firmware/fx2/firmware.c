@@ -29,8 +29,9 @@
 #define printf(...)
 #endif
 
+#include <cdc.h>
 
-
+#define SYNCDELAY SYNCDELAY4
 
 volatile __bit dosud=FALSE;
 volatile __bit dosuspend=FALSE;
@@ -45,7 +46,7 @@ void main() {
 #ifdef DEBUG
  SETCPUFREQ(CLK_48M); // required for sio0_init 
  // main_init can still set this to whatever you want.
- sio0_init(57600); // needed for printf if debug defined 
+ soft_sio0_init(57600); // needed for printf if debug defined 
 #endif
 
  main_init();
@@ -134,3 +135,23 @@ void suspend_isr() __interrupt SUSPEND_ISR {
  dosuspend=TRUE;
  CLEAR_SUSPEND();
 }
+
+
+void ISR_USART0(void) __interrupt 4 __critical {
+	if (RI) {
+		RI=0;
+		if (!cdc_can_send()) {
+			// Mark overflow
+		} else {
+			cdc_queue_data(SBUF0);
+		}
+		// FIXME: Should use a timer, rather then sending one byte at a
+		// time.
+		cdc_send_queued_data();
+	}
+	if (TI) {
+		TI=0;
+//		transmit();
+	}
+}
+
