@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# vim: set ts=4 sw=4 et sts=4 ai:
+
 from migen.fhdl.std import *
 from migen.fhdl.specials import Tristate
 from migen.bank.description import *
@@ -23,6 +26,85 @@ class I2C(Module, AutoCSR):
 
 
 class I2CShiftReg(Module, AutoCSR):
+
+    def __init__(self, pads):
+        # Data signal
+        _sda_w = Signal()
+        _sda_r = Signal()
+        _sda_oe = Signal()
+
+        self.specials += Tristate(pads.sda, _sda_w, _sda_oe, _sda_r)
+
+        # Clock signal
+        _scl_w = Signal()
+        _scl_r = Signal()
+        _scl_oe = Signal()
+
+        self.specials += Tristate(pads.scl, _scl_w, _scl_oe, _scl_r)
+
+        # **The value on SDA should not change when SCL is high**
+
+        # SCL state machine
+        scl_low = Signal
+        scl_high = Signal()
+        scl_rising = Signal()
+        scl_falling = Signal()
+
+        sda_low = Signal
+        sda_high = Signal()
+        sda_rising = Signal()
+        sda_falling = Signal()
+
+        # Data is placed on the SDA line after SCL goes low, and is sampled
+        # after the SCL line goes high.
+
+        # High level state transitions
+
+        # IDLE (while !start_cond) then TRANS
+        # TRANS (while !stop_cond) then IDLE
+
+        # IDLE -> START -> TRANSMITTING -> STOP -> IDLE
+        
+        # ADDRESS -> DATA0 -> DATAn
+
+        # State transitions;
+        # IDLE -> START
+        # START -> Sampling SDA
+        # Sampling SDA -> 
+
+        # Start condition:
+        # SDA goes low before SCL
+        # the master device leaves SCL high and pulls SDA low
+
+        # Stop condition:
+        # SDA goes high after SCL
+        # 0->1 (low to high) transition on SDA after a 0->1 transition on SCL
+
+        # Repeated Start condition:
+        # SDA is allowed to go high while SCL is low, 
+        # SCL is allowed to go high, and then
+        # SDA is brought low again while SCL is high
+
+        # Clock stretching
+        # At any point in the data transfer process, an addressed slave can
+        # hold the SCL line low after the master releases it.
+
+        # ACK / NACK bit
+        # Once the first 8 bits have been sent by the master, the slave takes
+        # control of SDA.
+        #  - ACK = 0 / Low
+        #  - NACK = 1 / High
+
+
+
+        # Messages are broken into two frames
+        # Address Frame
+        # One or more data frames
+        # Each frame is 9 bits long
+
+
+
+class I2CShiftReg(Module, AutoCSR):
     def __init__(self, pads):
 
         STATUS_FULL = 1
@@ -34,18 +116,26 @@ class I2CShiftReg(Module, AutoCSR):
         self.pads = pads
 
         ###
-
+	# Raw signals from the I/O pins which are debounced
         scl_raw = Signal()
-        sda_i = Signal()
         sda_raw = Signal()
+
+        sda_i = Signal()
+
         sda_drv = Signal()
         scl_drv = Signal()
-        _sda_drv_reg = Signal()
+
+
         self._sda_i_async = _sda_i_async = Signal()
         self._scl_i_async = _scl_i_async = Signal()
+
+	# IO Pin direction registers
+        _sda_drv_reg = Signal()
         _scl_drv_reg = Signal()
+
         self.sync += _sda_drv_reg.eq(sda_drv)
         self.sync += _scl_drv_reg.eq(scl_drv)
+
         self.specials += [
             Tristate(pads.sda, 0, _sda_drv_reg, _sda_i_async),
             Tristate(pads.scl, 0, _scl_drv_reg, _scl_i_async),
