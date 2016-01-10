@@ -5,6 +5,8 @@ firmware/lm32/boot.bin
 firmware/lm32/firmware.bin
 firmware/lm32/firmware.elf
 firmware/lm32/version.h
+firmware/fx2/*.adb
+firmware/fx2/*.cdb
 test/dump.png
 build
 *.pyc
