@@ -14,18 +14,21 @@
 # define htole16c(x) __bswap_constant_16(x)
 #endif
 
-typedef uint8_t __u8;
-typedef uint16_t __le16;
-typedef uint16_t __be16;
+#ifndef FX2_TYPES
+#define FX2_TYPES
+    typedef uint8_t __u8;
+    typedef uint16_t __le16;
+    typedef uint16_t __be16;
 
-typedef __u8 __le8;
-typedef __u8 __be8;
+    typedef __u8 __le8;
+    typedef __u8 __be8;
+#endif
+
 #define htobe8c(x) (x)
 #define htole8c(x) (x)
 #define FX2_MBFW_USBJTAG_END offsetof(union fx2_mbfw_usbjtag_t, data58)+1
 
 union fx2_mbfw_usbjtag_t {
-    struct {
         struct {
             __be8  len;
             __be16  addr;
@@ -321,8 +324,7 @@ union fx2_mbfw_usbjtag_t {
             __be16  addr;
             __u8    data[0];
         } __attribute__ ((packed)) data58;
-    };
-    __u8 bytes[5060];
+        __u8 bytes[5060];
 } fx2_mbfw_usbjtag = {
     .data0 = {
         .len        = htobe8c(0x06),

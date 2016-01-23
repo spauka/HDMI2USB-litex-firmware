@@ -163,14 +163,12 @@ class MicrobootConfig(_ConfigCommon):
 """ % (uname, name, len(segs)-1))
         s.append("""\
 union %s_t {
-    struct {
 """ % name)
         for i, seg in enumerate(segs):
             s.append(seg.c_struct("data%i" % i))
             s.append(";\n")
         s.append("""\
-    };
-    __u8 bytes[%i];
+        __u8 bytes[%i];
 } %s""" % (self.totalsize, name))
         return "".join(s)
 
@@ -267,12 +265,16 @@ if __name__ == "__main__":
 # define htole16c(x) __bswap_constant_16(x)
 #endif
 
+#ifndef FX2_TYPES
+#define FX2_TYPES
 typedef uint8_t __u8;
 typedef uint16_t __le16;
 typedef uint16_t __be16;
 
 typedef __u8 __le8;
 typedef __u8 __be8;
+#endif
+
 #define htobe8c(x) (x)
 #define htole8c(x) (x)
 """)
