@@ -211,8 +211,8 @@ _io = [
         Subsignal("data1_n", Pins("N22"), IOStandard("TMDS_33")),
         Subsignal("data2_p", Pins("P21"), IOStandard("TMDS_33")),
         Subsignal("data2_n", Pins("P22"), IOStandard("TMDS_33")),
-        Subsignal("scl", Pins("T21"), IOStandard("LVCMOS33")),
-        Subsignal("sda", Pins("R22"), IOStandard("LVCMOS33")),
+        Subsignal("scl", Pins("T21"), IOStandard("I2C"), Misc("PULLUP")),
+        Subsignal("sda", Pins("R22"), IOStandard("I2C"), Misc("PULLUP")),
         Subsignal("hpd_en", Pins("R20"), IOStandard("LVCMOS33"))
     ),
 
@@ -227,8 +227,8 @@ _io = [
         Subsignal("data1_n", Pins("H22"), IOStandard("TMDS_33")),
         Subsignal("data2_p", Pins("K20"), IOStandard("TMDS_33")),
         Subsignal("data2_n", Pins("L19"), IOStandard("TMDS_33")),
-        Subsignal("scl", Pins("L17"), IOStandard("LVCMOS33")),
-        Subsignal("sda", Pins("T18"), IOStandard("LVCMOS33")),
+        Subsignal("scl", Pins("L17"), IOStandard("I2C"), Misc("PULLUP")),
+        Subsignal("sda", Pins("T18"), IOStandard("I2C"), Misc("PULLUP")),
         Subsignal("hpd_en", Pins("V19"), IOStandard("LVCMOS33"))
     ),
 
@@ -272,8 +272,8 @@ _io = [
         Subsignal("data1_n", Pins("AB10"), IOStandard("TMDS_33")),
         Subsignal("data2_p", Pins("Y9"), IOStandard("TMDS_33")),
         Subsignal("data2_n", Pins("AB9"), IOStandard("TMDS_33")),
-        Subsignal("scl", Pins("Y7"), IOStandard("I2C")),
-        Subsignal("sda", Pins("Y10"), IOStandard("I2C")),
+        Subsignal("scl", Pins("Y7"), IOStandard("I2C"), Misc("PULLUP")),
+        Subsignal("sda", Pins("Y10"), IOStandard("I2C"), Misc("PULLUP")),
         Subsignal("hpd_notif", Pins("AB7"), IOStandard("LVCMOS33"))
     ),
 
@@ -288,8 +288,8 @@ _io = [
         Subsignal("data1_n", Pins("AB16"), IOStandard("TMDS_33")),
         Subsignal("data2_p", Pins("U14"), IOStandard("TMDS_33")),
         Subsignal("data2_n", Pins("U13"), IOStandard("TMDS_33")),
-        Subsignal("scl", Pins("Y17"), IOStandard("I2C")),
-        Subsignal("sda", Pins("AB17"), IOStandard("I2C")),
+        Subsignal("scl", Pins("Y17"), IOStandard("I2C"), Misc("PULLUP")),
+        Subsignal("sda", Pins("AB17"), IOStandard("I2C"), Misc("PULLUP")),
         Subsignal("hpd_notif", Pins("AB18"), IOStandard("LVCMOS33"))
     ),
 
