@@ -293,8 +293,8 @@ _io = [
         Subsignal("data2_n", Pins("A8"), IOStandard("TMDS_33")),
         # Disconnect JP6 and JP7 for FPGA SCL/SDA control, otherwise
         # this is connected to J3's SCL/SDA pins.
-        Subsignal("scl", Pins("D9"), IOStandard("I2C")),
-        Subsignal("sda", Pins("C9"), IOStandard("I2C")),
+        Subsignal("scl", Pins("D9"), IOStandard("I2C"), Misc("PULLUP")),
+        Subsignal("sda", Pins("C9"), IOStandard("I2C"), Misc("PULLUP")),
     ),
 
     ## onboard HDMI IN1 (PMODA)
@@ -322,8 +322,8 @@ _io = [
         Subsignal("data2_p", Pins("B12")),
         Subsignal("data2_n", Pins("A12")),
         # Make sure JP2 is connected. Shared with J1.
-        Subsignal("scl", Pins("C13"), IOStandard("LVCMOS25")),
-        Subsignal("sda", Pins("A13"), IOStandard("LVCMOS33")),
+        Subsignal("scl", Pins("C13"), IOStandard("I2C"), Misc("PULLUP")),
+        Subsignal("sda", Pins("A13"), IOStandard("I2C"), Misc("PULLUP")),
         #Subsignal("hpd_notif", Pins("G22"), IOStandard("LVCMOS33")),
         #Subsignal("hpd_en", Pins("G17"), IOStandard("LVCMOS33"))
     ),
@@ -355,8 +355,8 @@ _io = [
         Subsignal("data2_n", Pins("J18")),
         # Disconnect JP6 and JP7 for FPGA SCL/SDA control, otherwise
         # this is connected to J2's SCL/SDA pins.
-        Subsignal("scl", Pins("M16"), IOStandard("LVCMOS25")),
-        Subsignal("sda", Pins("M18"), IOStandard("LVCMOS25")),
+        Subsignal("scl", Pins("M16"), IOStandard("I2C"), Misc("PULLUP")),
+        Subsignal("sda", Pins("M18"), IOStandard("I2C"), Misc("PULLUP")),
         #Subsignal("hpd_notif", Pins("G16"), IOStandard("LVCMOS33")),
         #Subsignal("hpd_en", Pins("B20"), IOStandard("LVCMOS33"))
     ),
@@ -423,8 +423,8 @@ _io = [
         Subsignal("data2_p", Pins("N5"), IOStandard("TMDS_33")),
         Subsignal("data2_n", Pins("P6"), IOStandard("TMDS_33")),
         # Make sure JP2 is connected. Shared with JA.
-        #Subsignal("scl", Pins("C13"), IOStandard("LVCMOS33")),
-        #Subsignal("sda", Pins("A13"), IOStandard("LVCMOS33")),
+        #Subsignal("scl", Pins("C13"), IOStandard("I2C"), Misc("PULLUP")),
+        #Subsignal("sda", Pins("A13"), IOStandard("I2C"), Misc("PULLUP")),
     ),
 
 #        ("fpga_cfg",
