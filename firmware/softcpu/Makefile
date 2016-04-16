@@ -12,7 +12,7 @@ $(error TARGET not defined.)
 endif
 UTARGET = $(shell echo $(TARGET) | tr a-z A-Z)
 
-CFLAGS += -Wno-unused-function -DBOARD_$(UBOARD) -DTARGET_$(UTARGET)
+CFLAGS += -Wno-unused-function -DBOARD_$(UBOARD) -DTARGET_$(UTARGET) -g
 
 OBJECTS=isr.o \
         processor.o \

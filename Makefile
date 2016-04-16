@@ -176,6 +176,14 @@ clean:
 	rm -f firmware/fx2/hdmi2usb.hex
 
 
+debug:
+# Need to change or1k-generic.cfg to have 
+#set FPGATAPID 0x44008093
+#set TAP_TYPE XILINX_BSCAN
+	openocd -d 1 -f interface/ftdi/pipistrello.cfg -f board/or1k_generic.cfg -c 'init'
+	or1k-elf-gdb third_party/misoc/software/bios/bios.elf --eval-command='target remote localhost:3333'
+
+
 .DEFAULT_GOAL := help
 .NOTPARALLEL: *
 .PHONY: help all third_party/* gateware-submodules gateware-generate gateware-build gateware firmware download-prebuilt test

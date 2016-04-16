@@ -198,4 +198,4 @@ class VideomixerSoC(BaseSoC):
         for k, v in platform.hdmi_infos.items():
             self.add_constant(k, v)
 
-default_subtarget = VideomixerSoC
+default_subtarget = BaseSoC #VideomixerSoC
