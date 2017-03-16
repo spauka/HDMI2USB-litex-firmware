@@ -1,8 +1,8 @@
-from migen.fhdl.std import *
-from migen.genlib.record import Record
-from migen.flow.actor import Sink, Source
-from migen.genlib.resetsync import AsyncResetSynchronizer
-
+from litex.gen import *
+from litex.gen.fhdl import *
+from litex.gen.genlib.record import Record
+from litex.gen.genlib.resetsync import AsyncResetSynchronizer
+from litex.soc.interconnect.stream import Endpoint
 
 jtag_layout = [
     ("tdi", 1),
@@ -35,8 +35,8 @@ class BscanSpartan6(Module):
 
 class Phy(Module):
     def __init__(self, impl, width=8):
-        self.source = Source([("data", width)])
-        self.sink = Sink([("data", width)])
+        self.source = Endpoint([("data", width)])
+        self.sink = Endpoint([("data", width)])
 
         ###
 
@@ -53,21 +53,21 @@ class Phy(Module):
         # lsb first
         #
         # rx (host to target):
-        # 0x001 # tx ack
+        # 0x001 # tx ready
         # 0x1fe # rx data byte mask
-        # 0x200 # rx stb
+        # 0x200 # rx valid
         #
         # tx (target to host):
-        # 0x001 # rx ack
+        # 0x001 # rx ready
         # 0x1fe # tx data byte mask
-        # 0x200 # tx stb
+        # 0x200 # tx valid
 
         bit = Signal(max=width + 2)
         self.comb += [
             self.cd_jtag.clk.eq(jtag.clk),
-            jtag.tdo.eq(Mux(bit == 0, self.source.ack, reg[0])),
-            self.sink.ack.eq(jtag.tdi & jtag.shift & (bit == 0)),
-            self.source.stb.eq(jtag.tdi & jtag.shift & (bit == width + 1)),
+            jtag.tdo.eq(Mux(bit == 0, self.source.ready, reg[0])),
+            self.sink.ready.eq(jtag.tdi & jtag.shift & (bit == 0)),
+            self.source.valid.eq(jtag.tdi & jtag.shift & (bit == width + 1)),
             self.source.data.eq(reg[1:]),
         ]
         self.sync.jtag += [
@@ -81,7 +81,7 @@ class Phy(Module):
                     bit.eq(0),
                 ),
                 If(bit == 0,
-                    reg.eq(Cat(self.sink.data, self.sink.stb)),
+                    reg.eq(Cat(self.sink.data, self.sink.valid)),
                 ),
             ),
         ]
