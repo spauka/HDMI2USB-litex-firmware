@@ -15,14 +15,15 @@ from make import make_args, make_testdir
 class ServerProxy(threading.Thread):
     daemon = True
 
-    def __init__(self, port):
+    def __init__(self, port, baud=115200):
         threading.Thread.__init__(self)
         self.port = port
+        self.baud = baud
         self.ready = False
 
     def run(self):
-        print("Starting proxy to {}".format(self.port))
-        self.comm = CommUART(self.port, 115200)
+        print("Starting proxy to {} (@{})".format(self.port, self.baud))
+        self.comm = CommUART(self.port, self.baud)
         self.server = RemoteServer(self.comm)
         self.server.open()
         self.server.start()
@@ -34,12 +35,13 @@ def connect(desc, *args, add_args=None, **kw):
     make_args(parser, *args, **kw)
     parser.add_argument("--ipaddress")
     parser.add_argument("--port") #, desc="Serial port")
+    parser.add_argument("--baud", default=115200) #, desc="Serial port")
     if add_args is not None:
         add_args(parser)
     args = parser.parse_args()
 
     if args.port:
-        s = ServerProxy(args.port)
+        s = ServerProxy(args.port, args.baud)
         s.start()
         while not s.ready:
             continue
@@ -50,13 +52,13 @@ def connect(desc, *args, add_args=None, **kw):
         args.ipaddress = "{}.50".format(args.iprange)
 
     print("Connecting to {}".format(args.ipaddress))
-    wb = RemoteClient(args.ipaddress, 1234, csr_csv="{}/csr.csv".format(make_testdir(args)), csr_data_width=32)
+    wb = RemoteClient(args.ipaddress, 1234, csr_csv="{}/csr.csv".format(make_testdir(args)))
     wb.open()
     print()
     print("Device DNA: {}".format(get_dna(wb)))
     print("   Git Rev: {}".format(get_git(wb)))
     print("  Platform: {}".format(get_platform(wb)))
-    print("  Analyzer: {}".format(["No", "Yes"][hasattr(wb.regs, "analyzer")]))
+    print("  Analyzer: {}".format(["No", "Yes"][hasattr(wb.bases, "analyzer")]))
     print("      XADC: {}".format(get_xadc(wb)))
     print()
 
