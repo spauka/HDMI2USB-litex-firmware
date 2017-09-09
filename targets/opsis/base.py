@@ -228,7 +228,7 @@ class BaseSoC(SoCSDRAM):
     }
     mem_map.update(SoCSDRAM.mem_map)
 
-    def __init__(self, platform, **kwargs):
+    def __init__(self, platform, with_uart=True, **kwargs):
         clk_freq = 50*1000000
 
         if 'tofe_board' in kwargs:
@@ -250,7 +250,8 @@ class BaseSoC(SoCSDRAM):
         self.submodules.opsis_i2c = opsis_i2c.OpsisI2C(platform)
 
         self.submodules.suart = shared_uart.SharedUART(self.clk_freq, 115200)
-        self.suart.add_uart_pads(platform.request('fx2_serial'))
+        if with_uart:
+            self.suart.add_uart_pads(platform.request('fx2_serial'))
         self.submodules.uart = self.suart.uart
 
         self.submodules.spiflash = spi_flash.SpiFlash(
