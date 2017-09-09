@@ -243,7 +243,7 @@ class BaseSoC(SoCSDRAM):
             with_uart=False,
             **kwargs)
         self.submodules.crg = _CRG(platform, clk_freq)
-        self.platform.add_period_constraint(self.crg.cd_sys.clk, 1e9/clk_freq)
+        self.platform.add_period_constraint(self.crg.cd_sys.clk, 1e9/self.clk_freq)
 
         self.submodules.info = info.Info(platform, "opsis", self.__class__.__name__[:8])
 
@@ -266,7 +266,7 @@ class BaseSoC(SoCSDRAM):
         self.flash_boot_address = self.mem_map["spiflash"]+platform.gateware_size+bios_size
 
         # front panel (ATX)
-        self.submodules.front_panel = FrontPanelGPIO(platform, clk_freq)
+        self.submodules.front_panel = FrontPanelGPIO(platform, self.clk_freq)
         self.comb += self.crg.reset.eq(self.front_panel.reset)
 
         # sdram
