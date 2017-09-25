@@ -231,6 +231,8 @@ class BaseSoC(SoCSDRAM):
     def __init__(self, platform, **kwargs):
         clk_freq = 50*1000000
 
+        cpu_reset_address = self.mem_map["spiflash"]+platform.gateware_size
+
         if 'expansion' in kwargs:
             tofe_board_name = kwargs.get('expansion')
             del kwargs['expansion']
@@ -238,9 +240,11 @@ class BaseSoC(SoCSDRAM):
             tofe_board_name = None
 
         SoCSDRAM.__init__(self, platform, clk_freq,
-            integrated_rom_size=0x8000,
+            #integrated_rom_size=0x8000,
+            integrated_rom_size=None,
             integrated_sram_size=0x4000,
             with_uart=False,
+            cpu_reset_address=cpu_reset_address,
             **kwargs)
         self.submodules.crg = _CRG(platform, clk_freq)
         self.platform.add_period_constraint(self.crg.cd_sys.clk, 1e9/clk_freq)
@@ -263,6 +267,8 @@ class BaseSoC(SoCSDRAM):
             self.spiflash.bus, size=platform.spiflash_total_size)
 
         bios_size = 0x8000
+        self.add_constant("ROM_DISABLE", 1)
+        self.add_memory_region("rom", cpu_reset_address, bios_size)
         self.flash_boot_address = self.mem_map["spiflash"]+platform.gateware_size+bios_size
 
         # front panel (ATX)
