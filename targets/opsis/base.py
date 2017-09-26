@@ -237,7 +237,7 @@ class BaseSoC(SoCSDRAM):
         else:
             tofe_board_name = None
 
-        bios_size = 0x10000
+        bios_size = 0x8000
 
         SoCSDRAM.__init__(self, platform, clk_freq,
             #integrated_rom_size=0x8000,

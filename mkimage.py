@@ -5,7 +5,7 @@ import argparse
 
 from make import make_args, make_builddir, make_platform
 
-BIOS_SIZE = 0x10000
+BIOS_SIZE = 0x8000
 
 
 def main():
