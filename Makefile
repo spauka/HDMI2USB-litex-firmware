@@ -214,7 +214,7 @@ tftpd_stop:
 tftpd_start:
 	mkdir -p $(TFTPD_DIR)
 	sudo true
-	sudo atftpd --verbose --bind-address $(TFTP_IPRANGE).100 --daemon --logfile /dev/stdout --no-fork --user $(shell whoami) $(TFTPD_DIR) &
+	sudo atftpd --verbose --bind-address $(TFTP_IPRANGE).100 --blocksize 65464 --daemon --logfile /dev/stdout --no-fork --user $(shell whoami) $(TFTPD_DIR) &
 
 .PHONY: tftp tftpd_stop tftpd_start
 
