@@ -192,18 +192,17 @@ class BaseSoC(SoCSDRAM):
 
         cpu_reset_address = self.mem_map["spiflash"]+platform.gateware_size
 
-        clk_freq = (83 + Fraction(1, 3))*1000*1000
+        clk_freq = 50 * 1000 * 1000 #(83 + Fraction(1, 3))*1000*1000
         SoCSDRAM.__init__(self, platform, clk_freq,
-            #integrated_rom_size=0x8000,
             integrated_rom_size=None,
-            integrated_sram_size=0x4000,
+            #integrated_sram_size=0x4000,
             uart_baudrate=(19200, 115200)[int(os.environ.get('JIMMO', '0'))],
             cpu_reset_address=cpu_reset_address,
             **kwargs)
         self.submodules.crg = _CRG(platform, clk_freq)
         self.platform.add_period_constraint(self.crg.cd_sys.clk, 1e9/clk_freq)
 
-        self.submodules.info = info.Info(platform, "mimasv2", self.__class__.__name__[:8])
+        #self.submodules.info = info.Info(platform, "mimasv2", self.__class__.__name__[:8])
 
         self.submodules.spiflash = spi_flash.SpiFlashSingle(
             platform.request("spiflash"),
@@ -237,6 +236,6 @@ class BaseSoC(SoCSDRAM):
             self.ddrphy.clk4x_rd_strb.eq(self.crg.clk4x_rd_strb),
         ]
 
-        self.submodules.cas = cas.ControlAndStatus(platform, clk_freq)
+        #self.submodules.cas = cas.ControlAndStatus(platform, clk_freq)
 
 SoC = BaseSoC
