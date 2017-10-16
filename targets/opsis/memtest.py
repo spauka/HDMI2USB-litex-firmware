@@ -23,11 +23,18 @@ class MemTestSoC(BaseSoC):
 
         self.submodules.generator = LiteDRAMBISTGenerator(self.sdram.crossbar.get_port(mode="write", dw=32), random=False)
         self.submodules.checker = LiteDRAMBISTChecker(self.sdram.crossbar.get_port(mode="read", dw=32, reverse=True), random=False)
-        self.submodules.checker_scope = LiteDRAMBISTCheckerScope(self.checker)
+        #self.submodules.checker_scope = LiteDRAMBISTCheckerScope(self.checker)
 
-        analyzer_signals = self.checker_scope.signals()
+        #analyzer_signals = self.checker_scope.signals()
 
-        self.submodules.analyzer = LiteScopeAnalyzer(analyzer_signals, 1024)
+        self.submodules.analyzer = LiteScopeAnalyzer([
+            self.opsis_i2c.fx2_hack.scl,
+            self.opsis_i2c.fx2_hack.sda_i,
+            self.opsis_i2c.fx2_hack.sda_o,
+            self.opsis_i2c.fx2_hack.sda_oe,
+            self.opsis_i2c.fx2_hack.din,
+            self.opsis_i2c.fx2_hack.counter,
+        ], 1024)
 
     def do_exit(self, vns, filename="test/analyzer.csv"):
         self.analyzer.export_csv(vns, filename)

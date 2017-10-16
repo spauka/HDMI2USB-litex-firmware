@@ -179,7 +179,7 @@ class BaseSoC(SoCSDRAM):
         "spiflash",
         "ddrphy",
         "info",
-        "cas",
+#        "cas",
     )
     csr_map_update(SoCSDRAM.csr_map, csr_peripherals)
 
@@ -237,6 +237,6 @@ class BaseSoC(SoCSDRAM):
             self.ddrphy.clk4x_rd_strb.eq(self.crg.clk4x_rd_strb),
         ]
 
-        self.submodules.cas = cas.ControlAndStatus(platform, clk_freq)
+#        self.submodules.cas = cas.ControlAndStatus(platform, clk_freq)
 
 SoC = BaseSoC

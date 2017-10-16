@@ -1,6 +1,5 @@
 from litex.gen import *
 from litex.gen.genlib.resetsync import AsyncResetSynchronizer
-from litex.gen.fhdl.specials import Keep
 
 from litex.soc.integration.soc_core import mem_decoder
 from litex.soc.integration.soc_sdram import *
@@ -11,7 +10,7 @@ from litedram.phy import a7ddrphy
 from litedram.core import ControllerSettings
 
 from gateware.info import dna, xadc
-from gateware import oled
+#from gateware import oled
 
 
 class _CRG(Module):
@@ -86,7 +85,7 @@ class BaseSoC(SoCSDRAM):
         "ddrphy": 17,
         "dna":    18,
         "xadc":   19,
-        "oled":   20
+#        "oled":   20
     }
     csr_map.update(SoCSDRAM.csr_map)
 
@@ -105,7 +104,7 @@ class BaseSoC(SoCSDRAM):
         self.submodules.crg = _CRG(platform)
         self.submodules.dna = dna.DNA()
         self.submodules.xadc = xadc.XADC()
-        self.submodules.oled = oled.OLED(platform.request("oled"))
+#        self.submodules.oled = oled.OLED(platform.request("oled"))
 
         # sdram
         self.submodules.ddrphy = a7ddrphy.A7DDRPHY(platform.request("ddram"))

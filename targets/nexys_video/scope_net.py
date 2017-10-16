@@ -1,3 +1,4 @@
+from litex.gen import *
 
 from liteeth.common import convert_ip
 from liteeth.phy.s7rgmii import LiteEthPHYRGMII
@@ -5,7 +6,6 @@ from liteeth.core import LiteEthUDPIPCore
 from liteeth.frontend.etherbone import LiteEthEtherbone
 
 from litescope import LiteScopeIO, LiteScopeAnalyzer
-from litex.gen.fhdl.specials import Keep
 
 from targets.utils import csr_map_update
 from targets.nexys_video.base import SoC as BaseSoC
@@ -87,10 +87,8 @@ class EthScopeSoC(BaseSoC):
         self.add_cpu_or_bridge(self.etherbone)
         self.add_wb_master(self.etherbone.wishbone.bus)
 
-        self.specials += [
-            Keep(self.ethphy.crg.cd_eth_rx.clk),
-            Keep(self.ethphy.crg.cd_eth_tx.clk)
-        ]
+        self.ethphy.crg.cd_eth_rx.clk.attr.add("keep")
+        self.ethphy.crg.cd_eth_tx.clk.attr.add("keep")
 
         self.platform.add_period_constraint(self.crg.cd_sys.clk, 10.0)
         self.platform.add_period_constraint(self.ethphy.crg.cd_eth_rx.clk, 8.0)
